@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,13 +20,14 @@ public class MenuUIHandler : MonoBehaviour
     public void NewColorSelected(Color color)
     {
         // add code here to handle when a color is selected
-        tempColor = color;
+        //tempColor = color;
+        MainManager.Instance.TeamColor = color;
    
     }
 
     private void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        //DontDestroyOnLoad(this.gameObject);
     }
 
     private void Start()
@@ -33,6 +35,7 @@ public class MenuUIHandler : MonoBehaviour
         ColorPicker.Init();
         //this will call the NewColorSelected function when the color picker have a color button clicked.
         ColorPicker.onColorChanged += NewColorSelected;
+        ColorPicker.SelectColor(MainManager.Instance.TeamColor);
     }
     private void Update()
     {
@@ -46,7 +49,13 @@ public class MenuUIHandler : MonoBehaviour
 
     public void ExitGame()
     {
+        MainManager.Instance.SaveColor();
+#if UNITY_EDITOR
+        EditorApplication.ExitPlaymode();
+#else
+    
         Application.Quit();
+#endif
     }
 
     public void StartGame()
@@ -86,5 +95,17 @@ public class MenuUIHandler : MonoBehaviour
         byte g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
         byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
         return new Color32(r, g, b, 255);
+    }
+
+
+    public void SaveColorClicked()
+    {
+        MainManager.Instance.SaveColor();
+    }
+
+    public void LoadColorClicked()
+    {
+        MainManager.Instance.LoadColor();
+        ColorPicker.SelectColor(MainManager.Instance.TeamColor);
     }
 }
